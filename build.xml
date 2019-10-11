@@ -1,0 +1,63 @@
+<project>
+    <path id="classpath">
+        <fileset dir="deps">
+            <include name="mariadb-java-client-2.3.0.jar"/>
+            <include name="util-javafx.jar"/>
+        </fileset>
+    </path>
+
+    <path id="junit-classpath">
+        <fileset dir="deps">
+            <include name="mariadb-java-client-2.3.0.jar"/>
+            <include name="util-javafx.jar"/>
+            <include name="junit.jar"/>
+            <include name="org.hamcrest.core_1.3.0.v20180420-1519.jar"/>
+        </fileset>
+        <pathelement location="build/classes"/>
+    </path>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes" classpathref="classpath"/>
+    </target>
+
+    <target name="compile-test">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes" classpathref="classpath"/>
+        <javac srcdir="test" destdir="build/classes" classpathref="junit-classpath"/>
+    </target>
+
+    <target name="jar">
+        <mkdir dir="build/jar"/>
+        <jar destfile="build/jar/SmartCity.jar" basedir="build/classes">
+            <manifest>
+                <attribute name="Main-Class" value="smartcity.ui.SmartCityApplication"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="src" includes="smartcity/ui/*.fxml" />
+            <fileset dir="src" includes="smartcity/ui/*.properties" />
+            <zipfileset excludes="META-INF/*.SF" src="deps/mariadb-java-client-2.3.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="deps/util-javafx.jar"/>
+        </jar>
+    </target>
+
+    <target name="run">
+        <java jar="build/jar/SmartCity.jar" fork="true"/>
+    </target>
+
+    <target name="junit">
+        <mkdir dir="build/junit"/>
+        <junit fork="no" haltonfailure="false" printsummary="withOutAndErr" failureproperty="test.failed">
+            <formatter type="xml"/>
+            <formatter type="brief" usefile="false" />
+            <test name="smartcity.graphe.HmapTest" todir="build/junit"/>
+            <jvmarg line="-ea"/>
+            <classpath refid="junit-classpath"/>
+        </junit>
+        <fail if="test.failed"/>
+    </target>
+</project>

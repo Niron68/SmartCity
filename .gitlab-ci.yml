@@ -1,0 +1,26 @@
+image: openjdk:8-jdk
+
+before_script:
+  - apt update && apt install -y ant openjfx
+
+stages:
+  - test
+  - build
+
+test:
+  stage: test
+  script:
+    - ant compile-test junit
+  artifacts:
+    paths:
+      - build/junit
+    expire_in: 1 month
+
+build:
+  stage: build
+  script:
+    - ant compile jar
+  artifacts:
+    paths:
+      - build/jar/SmartCity.jar
+    expire_in: 3 months
